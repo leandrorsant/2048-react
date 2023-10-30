@@ -42,7 +42,7 @@ const addNumberToBoard = (n:number, board: number [][]) : number[][] => {
   do{
     x = getRandomInt(0,updatedBoard[0].length -1)
     y = getRandomInt(0,updatedBoard.length-1)
-    console.log(x+", "+y)
+    //console.log(x+", "+y)
   }while(updatedBoard[x][y] != 0)
   
   if(updatedBoard[x][y] === 0){
@@ -61,6 +61,8 @@ function App() {
     [0,0,0,0]
    ])
 
+   const [numberAdded, setNumberAdded] = useState(false);
+
   const [loading,setLoading] = useState(true)
 
   const addFirstNumberToBoard = (n: number) => {
@@ -72,12 +74,55 @@ function App() {
   }
 
   useEffect(()=> {
-    console.log(gameBoard)
+    //console.log(gameBoard)
   },[gameBoard])
+
+  useEffect(() =>{
+    if(numberAdded){  
+      setGameBoard(prev => prev = addNumberToBoard(2, gameBoard))
+      setNumberAdded(false)
+    }
+  } , [numberAdded])
   
   useEffect(()=>{
     setLoading(false);
     addFirstNumberToBoard(2);
+    document.onkeydown =  (e) => {
+      //alert(e.code)
+      switch (e.key) {  
+          case 'ArrowLeft':
+            const left = moveLeft(gameBoard);
+            if(left.moveCount > 0){
+              setGameBoard(prev => prev = left.board)
+              setGameBoard(addNumberToBoard(2,gameBoard));
+            }
+            
+              break;
+          case 'ArrowUp':
+            const up = moveUp(gameBoard);
+            if(up.moveCount > 0){
+              setGameBoard(prev => prev = up.board)
+              setGameBoard(addNumberToBoard(2,gameBoard));
+            }
+            break;
+  
+          case 'ArrowRight':
+              const {board, moveCount} = moveRight(gameBoard);
+              if(moveCount > 0){
+                setGameBoard(prev => prev = board)
+                setGameBoard(addNumberToBoard(2,gameBoard));
+              }  
+              break;
+  
+          case 'ArrowDown':
+            const down = moveDown(gameBoard);
+            if(down.moveCount > 0){
+              setGameBoard(prev => prev = down.board)
+              setGameBoard(addNumberToBoard(2,gameBoard));
+            }
+              break;
+      }
+    };  
   },[])
   
   const moveLeft = (board: number[][]) 
@@ -85,7 +130,8 @@ function App() {
     let updatedBoard = board.slice()
     let moveCount = 0;
     let merged = false;
-    for(let x =updatedBoard[0].length-1; x>=0;x--){
+
+    for(let x =0; x<updatedBoard[0].length;x++){
       let line = ""
       for(let y=updatedBoard.length-1; y>=0; y--){
         line = line + x+y+" ";
@@ -109,34 +155,28 @@ function App() {
           }
         }
       }
-      console.log(line);
     }
-
     return {board: updatedBoard, moveCount: moveCount}
   }
 
   const moveRight = (board: number[][]) 
   : {board: number[][], moveCount: number} => {
+    
     let updatedBoard = board.slice()
     let moveCount = 0;
     let merged = false;
-
-    for(var x=0;x<updatedBoard[0].length;x++){
-      for(var y=0;y<updatedBoard.length;y++){
+    for(let x=0;x<updatedBoard[0].length;x++){
+      for(let y=updatedBoard.length-1;y>=0;y--){
         if(y+1 < updatedBoard.length){
-          if(!merged
-            && updatedBoard[x][y] !== 0 
-            && (
+          if(!merged && (
                updatedBoard[x][y+1] === 0 
             || updatedBoard[x][y+1] === updatedBoard[x][y])){
-              
               merged = true;
-                moveCount++;
+              moveCount++;
               //set next number to the right
-              updatedBoard[x][y+1] = updatedBoard[x][y] + updatedBoard[x][y+1];
+              updatedBoard[x][y+1] += updatedBoard[x][y];
               //set current number to 0
               updatedBoard[x][y] = 0;
-              
             }else{
               merged = false
             }
@@ -212,42 +252,7 @@ function App() {
   }
 
 
-  document.onkeydown = function(e) {
-    //alert(e.code)
-    switch (e.code) {
-      
-        case 'ArrowLeft':
-          const left = moveLeft(gameBoard);
-          if(left.moveCount > 0){
-            setGameBoard(prev => prev = left.board)
-            setGameBoard(prev => prev = addNumberToBoard(2,gameBoard));
-          }
-            break;
-        case 'ArrowUp':
-          const up = moveUp(gameBoard);
-          if(up.moveCount > 0){
-            setGameBoard(prev => prev = up.board)
-            setGameBoard(prev => prev = addNumberToBoard(2,gameBoard));
-          }
-            break;
-
-        case 'ArrowRight':
-            const {board, moveCount} = moveRight(gameBoard);
-            if(moveCount > 0){
-              setGameBoard(prev => prev = board)
-              setGameBoard(prev => prev = addNumberToBoard(2,gameBoard));
-            }
-            break;
-
-        case 'ArrowDown':
-          const down = moveDown(gameBoard);
-          if(down.moveCount > 0){
-            setGameBoard(prev => prev = down.board)
-            setGameBoard(prev => prev = addNumberToBoard(2,gameBoard));
-          }
-            break;
-    }
-  };  
+  
 
 
   return (
@@ -257,4 +262,16 @@ function App() {
   );
 }
 
+const transpose = (matrix : number[][]) => {
+  for (let row = 0; row < matrix.length; row++) {
+    for (let column = 0; column < row; column++) {
+      let temp = matrix[row][column]
+      matrix[row][column] = matrix[column][row]
+      matrix[column][row] = temp
+    }
+  }
+  return matrix;
+}
+
 export default App;
+  
