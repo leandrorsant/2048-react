@@ -51,8 +51,50 @@ const addNumberToBoard = (n:number, board: number [][]) : number[][] => {
   return updatedBoard
 }
 
+//----------------------------------------
+function rotateRight(array : number [][]) {
+  let result : number[]|any = [];
+  array.forEach(function (a, i, aa) {
+      a.forEach(function (b, j, bb) {
+          result[bb.length - j - 1] = result[bb.length - j - 1] || [];
+          result[bb.length - j - 1][i] = b;
+      });
+  });
+  return result;
+}
+function filterZeros(arr : number[]){
+  return arr.filter(n => n != 0);
+}
+
+function fillWithZeros(arr:number[], length:number){
+  while(arr.length < length){
+    arr.push(0);
+  }
+  return arr;
+}
+
+function sumNumbersInArray(arr:number[]){
+  for(let x=0;x<arr.length -1; x++){
+      if(arr[x] == arr[x+1]){
+          arr[x] *=2
+          arr[x+1] = 0
+      }
+  }
+  return arr
+}
+
+function shiftArr(row:number[]){
+  let filteredRow = filterZeros(row);
+  let sum = sumNumbersInArray(filteredRow);
+  sum = filterZeros(sum)
+  return fillWithZeros(sum, row.length)
+}
+
+//------------------------------------------
+
 
 function App() {
+  const [update,setUpdate] = useState(false);
   const [gameBoard, setGameBoard] = useState(
    [
     [0,0,0,0],
@@ -73,9 +115,7 @@ function App() {
     }
   }
 
-  useEffect(()=> {
-    //console.log(gameBoard)
-  },[gameBoard])
+ 
 
   useEffect(() =>{
     if(numberAdded){  
@@ -87,7 +127,7 @@ function App() {
   useEffect(()=>{
     setLoading(false);
     addFirstNumberToBoard(2);
-    document.onkeydown =  (e) => {
+    document.onkeyup =  (e) => {
       //alert(e.code)
       switch (e.key) {  
           case 'ArrowLeft':
@@ -101,7 +141,7 @@ function App() {
           case 'ArrowUp':
             const up = moveUp(gameBoard);
             if(up.moveCount > 0){
-              setGameBoard(prev => prev = up.board)
+              setGameBoard(prev => prev = up.board )
               setGameBoard(addNumberToBoard(2,gameBoard));
             }
             break;
@@ -127,65 +167,67 @@ function App() {
   
   const moveLeft = (board: number[][]) 
   : {board: number[][], moveCount: number} => {
-    let updatedBoard = board.slice()
-    let moveCount = 0;
-    let merged = false;
-
-    for(let x =0; x<updatedBoard[0].length;x++){
-      let line = ""
-      for(let y=updatedBoard.length-1; y>=0; y--){
-        line = line + x+y+" ";
-        if(y-1 >= 0){
-          if(!merged
-            &&
-            updatedBoard[x][y] != 0
-            && (
-              updatedBoard[x][y-1] == 0
-              || updatedBoard[x][y-1] == updatedBoard[x][y]
-            )
-            ){
-            //move left
-            //merge
-            merged = true;
-            moveCount++
-            updatedBoard[x][y-1] = updatedBoard[x][y-1]+updatedBoard[x][y]
-            updatedBoard[x][y] = 0 
-          }else{
-            merged = false;
-          }
-        }
-      }
+    for(let x=0;x<board[0].length;x++){
+      board[x] = (shiftArr(board[x]))
     }
-    return {board: updatedBoard, moveCount: moveCount}
+    return {board: board.slice(), moveCount: 1}
   }
+  
+  // const moveLeft = (board: number[][]) 
+  // : {board: number[][], moveCount: number} => {
+  //   let updatedBoard = board.slice()
+  //   let moveCount = 0;
+  //   let merged = false;
+
+  //   for(let x =0; x<updatedBoard[0].length;x++){
+  //     let line = ""
+  //     for(let y=updatedBoard.length-1; y>=0; y--){
+  //       line = line + x+y+" ";
+  //       if(y-1 >= 0){
+  //         if(!merged
+  //           &&
+  //           updatedBoard[x][y] != 0
+  //           && (
+  //             updatedBoard[x][y-1] == 0
+  //             || updatedBoard[x][y-1] == updatedBoard[x][y]
+  //           )
+  //           ){
+  //           //move left
+  //           //merge
+  //           merged = true;
+  //           moveCount++
+  //           updatedBoard[x][y-1] = updatedBoard[x][y-1]+updatedBoard[x][y]
+  //           updatedBoard[x][y] = 0 
+  //         }else{
+  //           merged = false;
+  //         }
+  //       }
+  //     }
+  //   }
+  //   return {board: updatedBoard, moveCount: moveCount}
+  // }
 
   const moveRight = (board: number[][]) 
   : {board: number[][], moveCount: number} => {
-    
-    let updatedBoard = board.slice()
-    let moveCount = 0;
-    let merged = false;
-    for(let x=0;x<updatedBoard[0].length;x++){
-      for(let y=updatedBoard.length-1;y>=0;y--){
-        if(y+1 < updatedBoard.length){
-          if(!merged && (
-               updatedBoard[x][y+1] === 0 
-            || updatedBoard[x][y+1] === updatedBoard[x][y])){
-              merged = true;
-              moveCount++;
-              //set next number to the right
-              updatedBoard[x][y+1] += updatedBoard[x][y];
-              //set current number to 0
-              updatedBoard[x][y] = 0;
-            }else{
-              merged = false
-            }
-        }
-      }
+    for(let x=0;x<board[0].length;x++){
+      board[x] = shiftArr(board[x].reverse()).reverse()
     }
-    console.log(moveCount)
-    return {board: updatedBoard, moveCount: moveCount}
+    return {board: board.slice(), moveCount: 1}
   }
+
+
+  // const moveUp = (board: number[][]) 
+  // : {board: number[][], moveCount: number} => {
+  //   let rotated = board.slice()
+  //   rotated= rotateRight(board);
+  //   for(let x=0;x<rotated[0].length;x++){
+  //       rotated[x] = shiftArr(rotated[x])
+  //   }
+  //   rotated = rotateRight(rotated)
+  //   rotated = rotateRight(rotated)
+  //   rotated = rotateRight(rotated)
+  //   return {board: rotated, moveCount: 7}
+  // }
 
   const moveUp = (board: number[][]) 
   : {board: number[][], moveCount: number} => {
@@ -247,7 +289,7 @@ function App() {
         }
       }
     }
-    console.log(moveCount)
+    
     return {board: updatedBoard, moveCount: moveCount}
   }
 
