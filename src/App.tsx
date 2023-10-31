@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import Board from './components/Board';
 
-
 function getRandomInt(min: number, max:number) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -94,6 +93,8 @@ function shiftArr(row:number[]){
 
 
 function App() {
+  
+    
   const [update,setUpdate] = useState(false);
   const [gameBoard, setGameBoard] = useState(
    [
@@ -102,6 +103,9 @@ function App() {
     [0,0,0,0],
     [0,0,0,0]
    ])
+
+  
+
 
    const [numberAdded, setNumberAdded] = useState(false);
 
@@ -121,6 +125,7 @@ function App() {
     if(numberAdded){  
       setGameBoard(prev => prev = addNumberToBoard(2, gameBoard))
       setNumberAdded(false)
+      
     }
   } , [numberAdded])
   
@@ -162,7 +167,11 @@ function App() {
             }
               break;
       }
-    };  
+      
+      
+    };
+   
+   
   },[])
   
   const moveLeft = (board: number[][]) 
@@ -216,82 +225,180 @@ function App() {
   }
 
 
-  // const moveUp = (board: number[][]) 
-  // : {board: number[][], moveCount: number} => {
-  //   let rotated = board.slice()
-  //   rotated= rotateRight(board);
-  //   for(let x=0;x<rotated[0].length;x++){
-  //       rotated[x] = shiftArr(rotated[x])
-  //   }
-  //   rotated = rotateRight(rotated)
-  //   rotated = rotateRight(rotated)
-  //   rotated = rotateRight(rotated)
-  //   return {board: rotated, moveCount: 7}
-  // }
-
   const moveUp = (board: number[][]) 
   : {board: number[][], moveCount: number} => {
-    let updatedBoard = board.slice()
-    let moveCount = 0;
-    let merged = false
-    for(let x =updatedBoard[0].length-1; x>=0;x--){
-      let line = ""
-      for(let y=updatedBoard.length-1; y>=0; y--){
-        line = line + x+y+" ";
-        if(y-1 >= 0){
-          if(!merged
-            && updatedBoard[y][x] != 0
-            && (
-              updatedBoard[y-1][x] == 0
-              || updatedBoard[y-1][x] == updatedBoard[y][x]
-            )
-            ){
-            //move left
-            merged = true
-            moveCount++
-            updatedBoard[y-1][x] = updatedBoard[y-1][x]+updatedBoard[y][x]
-            updatedBoard[y][x] = 0 
-          }else{
-            merged = false;
+    for(let x=0;x<board.length;x++){
+      let row: number[] = []
+  
+      //push zeros to the bottom
+      for(let y=0;y<board.length;y++){
+          
+          if(board[y][x] !== 0){
+              row.push(board[y][x])
           }
-        }
+          
       }
-      console.log(line);
-    }
-
-    return {board: updatedBoard, moveCount: moveCount}
+      while(row.length<board.length){
+              row.push(0)
+      }
+  
+      for(let y=0;y<board.length-1;y++){   
+          board[y][x] = row[y] 
+      }
+      //------------------------------
+      for(let x=0;x<board.length;x++){
+          for(let y=0;y<board.length-1;y++){
+              if(board[y+1][x] !== 0 && board[y][x] ==board[y+1][x]){
+                  board[y][x] *=2
+                  board[y+1][x] =0
+              }
+          }
+  
+      }
+      
+      
   }
+  for(let x=0;x<board.length;x++){
+      let row: number[] = []
+  
+      //push zeros to the bottom
+      for(let y=0;y<board.length;y++){
+          
+          if(board[y][x] !== 0){
+              row.push(board[y][x])
+          }
+          
+      }
+      while(row.length<board.length){
+              row.push(0)
+      }
+  
+      for(let y=0;y<board.length-1;y++){   
+          board[y][x] = row[y] 
+      }
+      //------------------------------
+  }
+  //return board;
+
+
+    return {board: board.slice(), moveCount: 1}
+  }
+  
+
+  // const moveUp = (board: number[][]) 
+  // : {board: number[][], moveCount: number} => {
+  //   let updatedBoard = board.slice()
+  //   let moveCount = 0;
+  //   let merged = false
+  //   for(let x =updatedBoard[0].length-1; x>=0;x--){
+  //     let line = ""
+  //     for(let y=updatedBoard.length-1; y>=0; y--){
+  //       line = line + x+y+" ";
+  //       if(y-1 >= 0){
+  //         if(!merged
+  //           && updatedBoard[y][x] != 0
+  //           && (
+  //             updatedBoard[y-1][x] == 0
+  //             || updatedBoard[y-1][x] == updatedBoard[y][x]
+  //           )
+  //           ){
+  //           //move left
+  //           merged = true
+  //           moveCount++
+  //           updatedBoard[y-1][x] = updatedBoard[y-1][x]+updatedBoard[y][x]
+  //           updatedBoard[y][x] = 0 
+  //         }else{
+  //           merged = false;
+  //         }
+  //       }
+  //     }
+  //     console.log(line);
+  //   }
+
+  //   return {board: updatedBoard, moveCount: moveCount}
+  // }
 
   const moveDown = (board: number[][]) 
   : {board: number[][], moveCount: number} => {
-    let updatedBoard = board.slice()
-    let moveCount = 0;
-    let merged = false
-    for(var x=0;x<updatedBoard[0].length;x++){
-      for(var y=0;y<updatedBoard.length;y++){
-        if(y+1 < updatedBoard.length){
-          if(!merged
-            && updatedBoard[y][x] !== 0 
-            && (
-               updatedBoard[y+1][x] === 0 
-            || updatedBoard[y+1][x] === updatedBoard[y][x])){
-            
-              merged = true;
-                moveCount++;
-              //set next number to the right
-              updatedBoard[y+1][x] = updatedBoard[y][x] + updatedBoard[y+1][x];
-              //set current number to 0
-              updatedBoard[y][x] = 0;
-              
-            }else{
-              merged = false;
-            }
-        }
+    //push zeroes to top
+  for(let x=0;x<board.length;x++){
+    let row: number [] = []
+    for (let y=board.length-1; y>=0;y--){
+      row.push(board[y][x]);
+    }
+    //remove zeros
+    let rowWithoutZeros:number[]=[]
+    for(let y=0;y<row.length;y++){
+      if(row[y] !== 0){
+        rowWithoutZeros.push(row[y])
       }
     }
+    row = rowWithoutZeros
+
+    //merge
+    for(let y=row.length-1;y>0;y--){
+      if(row[y] ===  row[y-1]){
+        row[y] *= 2
+        row[y-1] = 0
+      }
+    }
+
+    //remove zeros
+    rowWithoutZeros = []
+    for(let y=0;y<row.length;y++){
+      if(row[y] !== 0){
+        rowWithoutZeros.push(row[y])
+      }
+    }
+    row = rowWithoutZeros
+
+    //add zeros back
+    while(row.length < board.length){
+      row = [...row,0]  
+    }
     
-    return {board: updatedBoard, moveCount: moveCount}
+    let z = 0;
+    for(let y=board.length-1;y>=0;y--){
+      board[y][x] = row[z]
+      z++;
+    }
+ 
+    
   }
+    
+    return {board: board.slice(), moveCount: 1}
+  }
+
+  // const moveDown = (board: number[][]) 
+  // : {board: number[][], moveCount: number} => {
+  //   let updatedBoard = board.slice()
+  //   let moveCount = 0;
+  //   let merged = false
+  //   for(var x=0;x<updatedBoard[0].length;x++){
+  //     for(var y=0;y<updatedBoard.length;y++){
+  //       if(y+1 < updatedBoard.length){
+  //         if(!merged
+  //           && updatedBoard[y][x] !== 0 
+  //           && (
+  //              updatedBoard[y+1][x] === 0 
+  //           || updatedBoard[y+1][x] === updatedBoard[y][x])){
+            
+  //             merged = true;
+  //               moveCount++;
+  //             //set next number to the right
+  //             updatedBoard[y+1][x] = updatedBoard[y][x] + updatedBoard[y+1][x];
+  //             //set current number to 0
+  //             updatedBoard[y][x] = 0;
+              
+  //           }else{
+  //             merged = false;
+  //           }
+  //       }
+  //     }
+  //   }
+    
+  //   return {board: updatedBoard, moveCount: moveCount}
+  // }
 
 
   
