@@ -130,43 +130,45 @@ function App() {
       switch (e.key) {  
           case 'ArrowLeft':
             const left = moveLeft(gameBoard);
-            if(left.moveCount > 0){
+            if(left.moveCount){
               //setGameBoard(prev => prev = left.board)
               //left.board = addNumberToBoard(2,left.board)
               setGameBoard(left.board);
-              
+              setAddNumber(true);
             }
-            setAddNumber(true);
+            
               break;
           case 'ArrowUp':
             const up = moveUp(gameBoard);
-            if(up.moveCount > 0){
+            setGameBoard(up.board);
+            if(up.moveCount){
               //up.board = addNumberToBoard(2,up.board)
-              setGameBoard(up.board);
               
+              setAddNumber(true);
             }
-            setAddNumber(true);
+            
+              
             break;
   
           case 'ArrowRight':
               const right = moveRight(gameBoard);
-              if(right.moveCount > 0){
+              if(right.moveCount){
                 //right.board = addNumberToBoard(2,right.board);
                 setGameBoard(right.board);
-                
+                setAddNumber(true);  
               }
-              setAddNumber(true);  
+                
               break;
   
           case 'ArrowDown':
             const down = moveDown(gameBoard);
-            if(down.moveCount > 0){
+            if(down.moveCount){
               //setGameBoard(prev => prev = down.board)
               //down.board = addNumberToBoard(2,down.board);
               setGameBoard(down.board);
-              
+              setAddNumber(true);
             }
-            setAddNumber(true);
+            
               break;
       }
       
@@ -177,11 +179,20 @@ function App() {
   },[])
   
   const moveLeft = (board: number[][]) 
-  : {board: number[][], moveCount: number} => {
+  : {board: number[][], moveCount: boolean} => {
+    let originalArray:number[][] = []
+    board.forEach(l =>{
+      let row:number[] = []
+      l.forEach(n =>{
+        row.push(n);
+      })
+      originalArray.push(row)
+    })
+
     for(let x=0;x<board[0].length;x++){
       board[x] = (shiftArr(board[x]))
     }
-    return {board: board, moveCount: 1}
+    return {board: board, moveCount: JSON.stringify(originalArray) !== JSON.stringify(board)}
   }
   
   // const moveLeft = (board: number[][]) 
@@ -219,15 +230,34 @@ function App() {
   // }
 
   const moveRight = (board: number[][]) 
-  : {board: number[][], moveCount: number} => {
+  : {board: number[][], moveCount: boolean} => {
+    let originalArray:number[][] = []
+    board.forEach(l =>{
+      let row:number[] = []
+      l.forEach(n =>{
+        row.push(n);
+      })
+      originalArray.push(row)
+    })
+
     for(let x=0;x<board[0].length;x++){
       board[x] = shiftArr(board[x].reverse()).reverse()
     }
-    return {board: board.slice(), moveCount: 1}
+    return {board: board.slice(), moveCount: JSON.stringify(originalArray) !== JSON.stringify(board)}
   }
 
   const moveUp = (board: number[][]) 
-  : {board: number[][], moveCount: number} => {
+  : {board: number[][], moveCount: boolean} => {
+    
+    let originalArray:number[][] = []
+    board.forEach(l =>{
+      let row:number[] = []
+      l.forEach(n =>{
+        row.push(n);
+      })
+      originalArray.push(row)
+    })
+
     //push zeroes to top
   for(let x=0;x<board.length;x++){
     let row: number [] = []
@@ -274,8 +304,10 @@ function App() {
       z++;
     }    
   }
-    
-    return {board: board, moveCount: 1}
+
+  
+
+    return {board: board.slice(), moveCount: JSON.stringify(originalArray) !== JSON.stringify(board)}
   }
 
 
@@ -370,7 +402,17 @@ function App() {
   // }
 
   const moveDown = (board: number[][]) 
-  : {board: number[][], moveCount: number} => {
+  : {board: number[][], moveCount: boolean} => {
+    let originalArray:number[][] = []
+    board.forEach(l =>{
+      let row:number[] = []
+      l.forEach(n =>{
+        row.push(n);
+      })
+      originalArray.push(row)
+    })
+
+
     //push zeroes to top
   for(let x=0;x<board.length;x++){
     let row: number [] = []
@@ -414,8 +456,7 @@ function App() {
       z++;
     }    
   }
-    
-    return {board: board, moveCount: 1}
+    return {board: board, moveCount: (JSON.stringify(originalArray) !== JSON.stringify(board))}
   }
 
   // const moveDown = (board: number[][]) 
